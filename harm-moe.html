@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>「Harm」</title>
+    <link rel="icon" type="image/png" href="logo.png" sizes="64x64">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Nunito:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Gilroy';
+            src: url('https://fonts.cdnfonts.com/css/gilroy-bold') format('woff2');
+            font-weight: 800;
+            font-style: normal;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* PHASE 1: STARTUP SCREEN */
+        #startup-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #08080a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* Underwater light rays effect from top */
+        #startup-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200%;
+            height: 150%;
+            background: 
+                conic-gradient(
+                    from 250deg at 50% 0%,
+                    transparent 0deg,
+                    transparent 10deg,
+                    rgba(255, 107, 157, 0.03) 15deg,
+                    rgba(255, 130, 180, 0.06) 20deg,
+                    rgba(255, 107, 157, 0.03) 25deg,
+                    transparent 30deg,
+                    transparent 40deg,
+                    rgba(200, 100, 160, 0.04) 45deg,
+                    rgba(220, 120, 170, 0.07) 50deg,
+                    rgba(200, 100, 160, 0.04) 55deg,
+                    transparent 60deg,
+                    transparent 75deg,
+                    rgba(255, 107, 157, 0.02) 80deg,
+                    rgba(255, 150, 200, 0.05) 85deg,
+                    rgba(255, 107, 157, 0.02) 90deg,
+                    transparent 95deg,
+                    transparent 360deg
+                );
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        /* Soft ambient glow overlay */
+        #startup-screen::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse 80% 50% at 50% 0%,
+                rgba(255, 120, 180, 0.1) 0%,
+                rgba(255, 107, 157, 0.05) 30%,
+                transparent 60%
+            );
+            pointer-events: none;
+        }
+
+        .startup-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ff6b9d;
+            text-shadow: 
+                0 0 5px rgba(255, 107, 157, 0.8),
+                0 0 10px rgba(255, 107, 157, 0.6),
+                0 0 20px rgba(255, 107, 157, 0.4),
+                0 0 40px rgba(255, 51, 102, 0.3);
+            animation: glowPulse 2s ease-in-out infinite;
+            letter-spacing: 0.3em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .startup-logo::before {
+            content: '「';
+            color: #fff;
+            text-shadow: none;
+        }
+
+        .startup-logo::after {
+            content: '」';
+            color: #fff;
+            text-shadow: none;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* Loading bar */
+        .loading-container {
+            margin-top: 60px;
+            width: 300px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading-bar-outer {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 107, 157, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-bar-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b9d, #ff3366, #ff6b9d);
+            background-size: 200% 100%;
+            border-radius: 2px;
+            animation: loadingProgress 1.8s linear forwards, shimmer 0.8s linear infinite;
+            box-shadow: 0 0 10px #ff6b9d, 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: #555;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .loading-percent {
+            font-family: 'Orbitron', sans-serif;
+            color: #ff6b9d;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        /* PHASE 2: BOOT SEQUENCE */
+        #boot-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            padding: 40px;
+            z-index: 900;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .boot-line {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            color: #0f0;
+            margin: 8px 0;
+            opacity: 0;
+            animation: bootFadeIn 0.3s ease forwards;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .boot-line.ok {
+            color: #0f0;
+        }
+
+        .boot-line.ok::before {
+            content: '[ OK ]  ';
+            color: #0f0;
+        }
+
+        .boot-line.failed {
+            color: #f00;
+        }
+
+        .boot-line.failed::before {
+            content: '[ FAILED ]  ';
+            color: #f00;
+        }
+
+        .boot-line.info {
+            color: #888;
+        }
+
+        .boot-line .boot-gif {
+            width: 1.5em;
+            height: 1.5em;
+            vertical-align: middle;
+        }
+
+        .boot-line .animated-dots {
+            display: inline-block;
+            min-width: 1.5em;
+        }
+
+        @keyframes bootFadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* PHASE 3: LOGIN SCREEN */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a0a1a 0%, #0a0a1a 50%, #0a1a1a 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 800;
+            opacity: 1;
+            transition: opacity 2s ease;
+        }
+
+        #login-screen.fade-out {
+            opacity: 0;
+        }
+
+        .login-container {
+            text-align: center;
+            padding: 40px 60px;
+        }
+
+        .login-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.3), rgba(255, 51, 102, 0.2));
+            border: 3px solid rgba(255, 107, 157, 0.4);
+            margin: 0 auto 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 
+                0 0 40px rgba(255, 107, 157, 0.3),
+                inset 0 0 40px rgba(0, 0, 0, 0.3);
+            animation: avatarFloat 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-avatar svg {
+            width: 70px;
+            height: 70px;
+            fill: rgba(255, 107, 157, 0.7);
+            filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.5));
+        }
+
+        @keyframes avatarFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .login-username {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 25px;
+        }
+
+        .login-footer-os {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .harmos-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-shadow: 0 0 15px rgba(255, 107, 157, 0.5);
+        }
+
+        .login-input-wrapper {
+            position: relative;
+            width: 300px;
+            margin: 0 auto 20px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 30px;
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            border-color: #ff6b9d;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .login-input::placeholder {
+            color: #555;
+        }
+
+        .login-input.typing {
+            caret-color: transparent;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: #ff6b9d;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+
+        .password-toggle:hover svg {
+            opacity: 1;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background: #ff6b9d;
+            margin-left: 2px;
+            animation: cursorBlink 0.8s ease-in-out infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .password-dots {
+            letter-spacing: 0.3em;
+        }
+
+        .login-btn {
+            padding: 15px 60px;
+            background: linear-gradient(135deg, #ff6b9d, #ff3366);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            opacity: 1;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+        }
+
+        /* Shake animation for incorrect password attempt */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .login-btn.shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .login-footer {
+            margin-top: 40px;
+            color: #444;
+            font-size: 0.8rem;
+        }
+
+        /* PHASE 4: MAIN OS SCREEN */
+        #os-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 80% 20%, rgba(255, 107, 157, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(120, 80, 255, 0.05) 0%, transparent 50%),
+                linear-gradient(135deg, #0f0a14 0%, #1a0f1f 30%, #0d0a12 70%, #0a0810 100%);
+            display: none;
+            flex-direction: column;
+            z-index: 700;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        #os-screen.visible {
+            opacity: 1;
+        }
+
+        #os-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 107, 157, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 157, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Clean ambient glow circles */
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 {
+            width: 600px;
+            height: 600px;
+            top: -200px;
+            right: -200px;
+            background: radial-gradient(circle, rgba(255, 107, 157, 0.2) 0%, rgba(255, 107, 157, 0.05) 40%, transparent 70%);
+            animation: glowFloat 10s ease-in-out infinite;
+        }
+
+        .glow-2 {
+            width: 450px;
+            height: 450px;
+            bottom: 50px;
+            right: 150px;
+            background: radial-gradient(circle, rgba(255, 51, 102, 0.15) 0%, rgba(255, 51, 102, 0.03) 45%, transparent 70%);
+            animation: glowFloat 12s ease-in-out infinite reverse;
+        }
+
+        .glow-3 {
+            width: 350px;
+            height: 350px;
+            bottom: -100px;
+            left: 25%;
+            background: radial-gradient(circle, rgba(120, 80, 255, 0.12) 0%, rgba(120, 80, 255, 0.02) 50%, transparent 70%);
+            animation: glowFloat 14s ease-in-out infinite 2s;
+        }
+
+        @keyframes glowFloat {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1); 
+            }
+            50% { 
+                transform: translate(25px, -20px) scale(1.08); 
+            }
+        }
+
+        /* Character silhouette in bottom right */
+        .character-silhouette {
+            position: absolute;
+            bottom: 48px;
+            right: 0;
+            width: 450px;
+            height: 500px;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 1;
+            background: linear-gradient(to top, transparent 0%, rgba(255, 107, 157, 0.3) 100%);
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'%3E%3Cpath d='M200 50 C150 50 120 80 110 120 C100 160 105 180 100 200 C95 220 70 230 65 260 C60 290 75 310 80 330 C60 340 40 360 35 400 C30 440 50 480 100 490 L300 490 C350 480 370 440 365 400 C360 360 340 340 320 330 C325 310 340 290 335 260 C330 230 305 220 300 200 C295 180 300 160 290 120 C280 80 250 50 200 50' fill='white'/%3E%3Ccircle cx='200' cy='90' r='50' fill='white'/%3E%3C/svg%3E");
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: bottom right;
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'%3E%3Cpath d='M200 50 C150 50 120 80 110 120 C100 160 105 180 100 200 C95 220 70 230 65 260 C60 290 75 310 80 330 C60 340 40 360 35 400 C30 440 50 480 100 490 L300 490 C350 480 370 440 365 400 C360 360 340 340 320 330 C325 310 340 290 335 260 C330 230 305 220 300 200 C295 180 300 160 290 120 C280 80 250 50 200 50' fill='white'/%3E%3Ccircle cx='200' cy='90' r='50' fill='white'/%3E%3C/svg%3E");
+            -webkit-mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: bottom right;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ff6b9d;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1);
+            }
+        }
+
+        /* Desktop Area */
+        .desktop {
+            flex: 1;
+            padding: 70px 30px 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 80px);
+            grid-template-rows: repeat(auto-fill, 100px);
+            gap: 15px 50px;
+            align-content: start;
+            position: relative;
+            z-index: 2;
+        }
+
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(255, 107, 157, 0.1);
+        }
+
+        .desktop-icon img,
+        .desktop-icon .icon-placeholder {
+            width: 52px;
+            height: 52px;
+            margin-bottom: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b9d, #ff3366);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .desktop-icon .icon-placeholder svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .desktop-icon span {
+            font-size: 0.75rem;
+            text-align: center;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .hall-of-shame-icon {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        /* Top header branding */
+        .os-header {
+            position: absolute;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ff6b9d;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 15px rgba(255, 107, 157, 0.6);
+            z-index: 10;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            height: 48px;
+            background: rgba(10, 5, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 107, 157, 0.15);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .taskbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .taskbar-right {
+            margin-left: auto;
+        }
+
+        .start-button {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #ff6b9d, #ff3366);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .start-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .system-tray {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 15px;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+
+        .system-tray .tray-icon {
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .system-tray .tray-icon:hover {
+            opacity: 1;
+        }
+
+        .system-tray .time {
+            color: #fff;
+        }
+
+        /* Music Widget */
+        .music-widget {
+            position: absolute;
+            bottom: 58px;
+            right: 10px;
+            width: 320px;
+            background: rgba(15, 10, 20, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 107, 157, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 157, 0.1);
+        }
+
+        .music-widget.active {
+            display: block;
+            animation: menuSlideUp 0.2s ease;
+        }
+
+        .music-widget-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .music-album-art {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #ff6b9d, #ff3366);
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+
+        .music-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .music-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .music-artist {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: #ff6b9d;
+            margin-top: 2px;
+        }
+
+        .music-progress-container {
+            margin-bottom: 12px;
+        }
+
+        .music-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 107, 157, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .music-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b9d, #ff3366);
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+
+        .music-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .music-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+        }
+
+        .music-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #aaa;
+            transition: fill 0.2s ease;
+        }
+
+        .music-btn:hover svg {
+            fill: #ff6b9d;
+        }
+
+        .music-btn.play-pause {
+            background: linear-gradient(135deg, #ff6b9d, #ff3366);
+            padding: 12px;
+        }
+
+        .music-btn.play-pause svg {
+            fill: #fff;
+            width: 24px;
+            height: 24px;
+        }
+
+        .music-btn.play-pause:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .music-volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .music-volume-icon {
+            width: 18px;
+            height: 18px;
+            fill: #aaa;
+        }
+
+        .music-volume-slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 107, 157, 0.15);
+            border-radius: 2px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .music-volume-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ff6b9d;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+        }
+
+        .music-volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #ff6b9d;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+        }
+
+        /* Start Menu */
+        .start-menu {
+            position: absolute;
+            bottom: 58px;
+            left: 10px;
+            width: 280px;
+            background: rgba(15, 10, 20, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 107, 157, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 157, 0.1);
+        }
+
+        .start-menu.active {
+            display: block;
+            animation: menuSlideUp 0.2s ease;
+        }
+
+        @keyframes menuSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .start-menu-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ff6b9d;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px rgba(255, 107, 157, 0.4);
+        }
+
+        .start-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #ccc;
+            font-size: 0.85rem;
+        }
+
+        .start-menu-item:hover {
+            background: rgba(255, 107, 157, 0.15);
+            color: #fff;
+        }
+
+        .start-menu-item svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            opacity: 0.7;
+        }
+
+        .start-menu-divider {
+            height: 1px;
+            background: rgba(255, 107, 157, 0.1);
+            margin: 8px 0;
+        }
+
+        /* Window */
+        .window {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            max-width: 90%;
+            background: rgba(20, 10, 30, 0.95);
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(255, 107, 157, 0.1);
+            z-index: 50;
+            will-change: transform, left, top;
+        }
+
+        .window.dragging {
+            user-select: none;
+            transition: none !important;
+        }
+
+        @keyframes windowOpen {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        .window-header {
+            background: linear-gradient(90deg, rgba(255, 107, 157, 0.2), transparent);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 107, 157, 0.2);
+            cursor: grab;
+        }
+
+        .window-header:active {
+            cursor: grabbing;
+        }
+
+        .window-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: #ff6b9d;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-controls button {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .window-controls .minimize { background: #ffbd2e; }
+        .window-controls .maximize { background: #27c93f; }
+        .window-controls .close { background: #ff5f57; }
+
+        .window-controls button:hover {
+            transform: scale(1.2);
+        }
+
+        .window-content {
+            padding: 30px;
+            max-height: calc(100% - 50px);
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .window-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        .window.fullscreen {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: calc(100% - 48px) !important;
+            border-radius: 0;
+            transform: none !important;
+        }
+
+        .window.fullscreen .window-content {
+            max-height: calc(100vh - 98px);
+        }
+
+        /* Hall of Shame styles */
+        #hall-of-shame { color: #ddd; padding: 18px; }
+        .hall-title { text-align: center; font-family: 'Orbitron', sans-serif; color: #d6ff2e; margin-bottom: 18px; }
+        .hall-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .hall-card { background: rgba(10,10,10,0.7); border: 1px solid rgba(255,255,255,0.04); padding: 10px; display:flex; flex-direction:column; }
+        .hall-image { width:100%; height:180px; background-size:cover; background-position:center; border:1px solid rgba(0,0,0,0.4); margin-bottom:10px; }
+        .hall-body { padding: 6px; }
+        .hall-name { font-weight:700; color:#d6ff2e; margin-bottom:6px; }
+        .hall-bio { font-size:0.9rem; color:#ccc; line-height:1.2; max-height:120px; overflow:auto; }
+        /* Custom hot-pink scrollbar for hall bios */
+        .hall-bio {
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: #ff6b9d rgba(0,0,0,0.18);
+        }
+        .hall-bio::-webkit-scrollbar { width: 10px; }
+        .hall-bio::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.18);
+            border-radius: 10px;
+        }
+        .hall-bio::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #ff6b9d 0%, #ff3366 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(0,0,0,0.25);
+        }
+        .hall-bio::-webkit-scrollbar-thumb:hover { filter: brightness(1.05); }
+
+        /* Keep Hall images a fixed visual size when the Hall window is fullscreen */
+        .window.fullscreen #hall-of-shame .hall-image {
+            height: 180px !important;
+            min-height: 180px;
+            max-height: 180px;
+            background-size: cover;
+            background-position: center center;
+            flex: 0 0 180px;
+        }
+        /* Keep the hall card grid from expanding full-width in fullscreen: center and cap width */
+        .window.fullscreen #hall-of-shame .hall-grid {
+            max-width: 760px;
+            margin: 0 auto;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .post-templates { margin-top:22px; }
+        .post-templates h3 { color:#fff; margin-bottom:10px; }
+        .template-grid { display:flex; gap:12px; }
+        .template-card { background: rgba(20,10,20,0.9); border:1px solid rgba(255,255,255,0.04); padding:8px; width:30%; display:flex; gap:8px; align-items:center; }
+        .template-thumb { width:72px; height:56px; background-size:cover; background-position:center; border:1px solid rgba(0,0,0,0.3); }
+        .template-content { color:#ddd; }
+        .template-title { font-weight:800; color:#d6ff2e; margin-bottom:6px; }
+        .template-desc { font-size:0.85rem; color:#ccc; }
+
+        /* Scanline effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.03),
+                rgba(0, 0, 0, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* CRT flicker */
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+        }
+
+        .crt-effect {
+            animation: flicker 5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <!-- PHASE 1: Startup Screen -->
+    <div id="startup-screen" class="crt-effect">
+        <div class="startup-logo">Harm</div>
+        <div class="loading-container">
+            <div class="loading-bar-outer">
+                <div class="loading-bar-inner" id="loading-bar"></div>
+            </div>
+            <div class="loading-text">Initializing System</div>
+            <div class="loading-percent" id="loading-percent">0%</div>
+        </div>
+    </div>
+
+    <!-- PHASE 2: Boot Sequence -->
+    <div id="boot-screen">
+        <div id="boot-lines"></div>
+    </div>
+
+    <!-- PHASE 3: Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="login-avatar">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M12 14c-6 0-8 3-8 5v1h16v-1c0-2-2-5-8-5z"/>
+                </svg>
+            </div>
+            <div class="login-username">admin</div>
+            <div class="login-input-wrapper">
+                <input type="password" class="login-input" placeholder="Password" id="password-input">
+                <button class="password-toggle" onclick="togglePasswordVisibility()" type="button">
+                    <svg viewBox="0 0 24 24" id="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+            </div>
+            <button class="login-btn" id="login-btn">Enter</button>
+        </div>
+        <div class="login-footer-os">
+            <span class="harmos-brand">HarmOS</span>
+        </div>
+    </div>
+
+    <!-- PHASE 4: Main OS Screen -->
+    <div id="os-screen">
+        <!-- Clean ambient glow circles -->
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+        
+        <!-- Floating particles -->
+        <div class="particles" id="particles"></div>
+
+        <div class="desktop">
+            <div class="desktop-icon" onclick="openWindow('euro')">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6 0-8 3-8 5v1h16v-1c0-2-2-5-8-5z"/></svg>
+                </div>
+                <span>euro</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('gunshot')">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6 0-8 3-8 5v1h16v-1c0-2-2-5-8-5z"/></svg>
+                </div>
+                <span>gunshot</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('evade')">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6 0-8 3-8 5v1h16v-1c0-2-2-5-8-5z"/></svg>
+                </div>
+                <span>evade</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('jaklic')">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6 0-8 3-8 5v1h16v-1c0-2-2-5-8-5z"/></svg>
+                </div>
+                <span>jaklic</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('qozry')">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M12 14c-6 0-8 3-8 5v1h16v-1c0-2-2-5-8-5z"/></svg>
+                </div>
+                <span>qozry</span>
+            </div>
+            
+            <!-- Hall of Shame - positioned bottom right -->
+            <div class="desktop-icon hall-of-shame-icon" onclick="openWindow('hall')">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                    </svg>
+                </div>
+                <span>Hall of Shame</span>
+            </div>
+            <!-- Game icon - top right -->
+            <div class="desktop-icon game-icon" onclick="openGame()" style="position: absolute; top: 20px; right: 20px;">
+                <div class="icon-placeholder">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 7H3v10h18V7zM7 11H5v2h2v-2zm4 0H9v2h2v-2zm4 0h-2v2h2v-2z"/>
+                    </svg>
+                </div>
+                <span>Game</span>
+            </div>
+        </div>
+
+        <!-- Header branding -->
+        <div class="os-header">harm.moe</div>
+
+        <!-- Individual Bio Windows (hidden by default) -->
+        <div class="window" id="window-euro" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">euro</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('window-euro')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('window-euro')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeWindow('window-euro')"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="hall-body">
+                    <div class="hall-name">euro</div>
+                    <div class="hall-bio">Profile details for euro. Replace with real content as needed.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="window-gunshot" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">gunshot</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('window-gunshot')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('window-gunshot')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeWindow('window-gunshot')"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="hall-body">
+                    <div class="hall-name">gunshot</div>
+                    <div class="hall-bio">Profile details for gunshot. Replace with real content as needed.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="window-evade" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">evade</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('window-evade')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('window-evade')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeWindow('window-evade')"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="hall-body">
+                    <div class="hall-name">evade</div>
+                    <div class="hall-bio">Profile details for evade. Replace with real content as needed.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="window-jaklic" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">jaklic</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('window-jaklic')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('window-jaklic')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeWindow('window-jaklic')"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="hall-body">
+                    <div class="hall-name">jaklic</div>
+                    <div class="hall-bio">Profile details for jaklic. Replace with real content as needed.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="window-qozry" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">qozry</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('window-qozry')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('window-qozry')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeWindow('window-qozry')"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="hall-body">
+                    <div class="hall-name">qozry</div>
+                    <div class="hall-bio">Profile details for qozry. Replace with real content as needed.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dedicated Hall of Shame window (only hall UI; post templates removed) -->
+        <div class="window" id="hall-window" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">Hall of Shame</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('hall-window')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('hall-window')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeWindow('hall-window')"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <div id="hall-of-shame">
+                    <h2 class="hall-title">HALL OF SHAME</h2>
+                    <div class="hall-grid">
+                        <!-- Card 1 -->
+                        <div class="hall-card">
+                            <div class="hall-image" style="background-image: url('KyleMooneyWest.png')"></div>
+                            <div class="hall-body">
+                                <div class="hall-name">Kyle Mooney West</div>
+                                <div class="hall-bio">Kyle Mooney West, also known as mommy.rukia on tiktok, is a 23 year old man who lives his life working at taco bell and wanking to kids. Got doxxed by Jaklic, Tosen, and Evade then sat in discord vc expressing how scared he was. Known for hitting up minors, sending cheese pizza and l0li, leaking a 15 year old, and recording peoples cards for fraud. Don't be like this guy.</div>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="hall-card">
+                            <div class="hall-image" style="background-image: url('TristenAlexanderKainoahCenteno.png')"></div>
+                            <div class="hall-body">
+                                <div class="hall-name">Chudlord Tristen</div>
+                                <div class="hall-bio">Fat ugly ass chud named Tristen Alexander Kainoah Centeno makes a living in his cheap ass taco bell in alaska while making poor attempts at getting girls on discord by continuously harassing them.</div>
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="hall-card">
+                            <div class="hall-image" style="background-image: url('kxlookie.png')"></div>
+                            <div class="hall-body">
+                                <div class="hall-name">Kaiden Means</div>
+                                <div class="hall-bio">Worst showcase of a kid who ruined his life at a young age. Decided to become an edgy dork who actively makes jokes about claiming 764 and sending Cheese Pizza around. Has been banned from discord over 10 times for Child Safety but swears he did nothing wrong. Got on his knees after being doxxed and swore to "never misbehave again"</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Window (iframe to game) -->
+        <div class="window" id="game-window" style="display: none;">
+            <div class="window-header">
+                <span class="window-title">Game</span>
+                <div class="window-controls">
+                    <button class="minimize" onclick="event.stopPropagation(); minimizeWindow('game-window')"></button>
+                    <button class="maximize" onclick="event.stopPropagation(); toggleFullscreenWindow('game-window')"></button>
+                    <button class="close" onclick="event.stopPropagation(); closeGame()"></button>
+                </div>
+            </div>
+            <div class="window-content">
+                <iframe id="game-iframe" src="" style="width:100%; height:60vh; border:0; background:#000"></iframe>
+            </div>
+        </div>
+
+        <!-- Start Menu -->
+        <div class="start-menu" id="start-menu">
+            <div class="start-menu-header">HarmOS</div>
+            <div class="start-menu-item" onclick="sessionStorage.removeItem('harmMoeBooted'); location.reload()">
+                <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                Restart
+            </div>
+        </div>
+
+        <!-- Music Widget -->
+        <div class="music-widget" id="music-widget">
+            <div class="music-widget-header">
+                <img src="yenny.png" alt="Album Art" class="music-album-art" id="album-art">
+                <div class="music-info">
+                    <div class="music-title" id="music-title">feels good</div>
+                    <div class="music-artist" id="music-artist">yen</div>
+                </div>
+            </div>
+            <div class="music-progress-container">
+                <div class="music-progress-bar" id="progress-bar" onclick="seekMusic(event)">
+                    <div class="music-progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="music-time">
+                    <span id="current-time">0:00</span>
+                    <span id="total-time">0:00</span>
+                </div>
+            </div>
+            <div class="music-controls">
+                <button class="music-btn" id="prev-btn" onclick="prevTrack()">
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button class="music-btn play-pause" id="play-pause-btn" onclick="togglePlay()">
+                    <svg viewBox="0 0 24 24" id="play-icon"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="music-btn" id="next-btn" onclick="nextTrack()">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+            </div>
+            <div class="music-volume-container">
+                <svg class="music-volume-icon" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                </svg>
+                <input type="range" class="music-volume-slider" id="volume-slider" min="0" max="100" value="50" oninput="setVolume(this.value)">
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="taskbar-left">
+                <button class="start-button" onclick="toggleStartMenu()">
+                    <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+                </button>
+            </div>
+            <div class="taskbar-right">
+                <div class="system-tray">
+                    <svg class="tray-icon" id="sound-tray-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" onclick="toggleMusicWidget()">
+                        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                    </svg>
+                    <span class="time" id="clock">00:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track if password is fully typed
+        let passwordFullyTyped = false;
+        
+        // Music player state
+        let musicPlayer = null;
+        let isPlaying = false;
+        
+        // Boot sequence messages - with special handling for first line
+        const bootMessages = [
+            { type: 'info', text: '', special: false },
+            { type: 'info', text: 'HarmOS v2.0.25 - Initializing', special: 'dots-and-gif' },
+            { type: 'info', text: '', special: false },
+            { type: 'ok', text: 'Loading HarmOS services...' },
+            { type: 'ok', text: 'Starting NetworkManager...' },
+            { type: 'ok', text: 'Mounting filesystem...' },
+            { type: 'ok', text: 'Loading kernel modules...' },
+            { type: 'failed', text: 'Failed to start: Brain...' },
+            { type: 'ok', text: 'Starting display manager...' },
+            { type: 'ok', text: 'Initializing harm.moe services...' },
+            { type: 'info', text: '', special: false },
+            { type: 'info', text: 'System ready. Starting HarmOS...' },
+        ];
+
+        // Update clock - 12 hour format
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 should be 12
+            document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Check if we've already booted this session
+        const hasBooted = sessionStorage.getItem('harmMoeBooted');
+
+        // Loading bar percentage animation - smooth and fast
+        function animateLoadingBar() {
+            const percentEl = document.getElementById('loading-percent');
+            const duration = 1800;
+            const startTime = performance.now();
+            
+            function updatePercent(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                percentEl.textContent = Math.floor(progress * 100) + '%';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updatePercent);
+                }
+            }
+            requestAnimationFrame(updatePercent);
+        }
+
+        // Phase transitions
+        function startSequence() {
+            // If already booted this session, skip to OS
+            if (hasBooted) {
+                document.getElementById('startup-screen').style.display = 'none';
+                document.getElementById('boot-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('os-screen').style.display = 'flex';
+                document.getElementById('os-screen').classList.add('visible');
+                initMusicPlayer();
+                return;
+            }
+
+            // Start loading bar animation
+            animateLoadingBar();
+            
+            // Phase 1: Startup logo (2 seconds - matches loading bar)
+            setTimeout(() => {
+                document.getElementById('startup-screen').style.display = 'none';
+                document.getElementById('boot-screen').style.display = 'block';
+                startBootSequence();
+            }, 2000);
+        }
+
+        function startBootSequence() {
+            const bootContainer = document.getElementById('boot-lines');
+            let index = 0;
+
+            function addBootLine() {
+                if (index < bootMessages.length) {
+                    const msg = bootMessages[index];
+                    const line = document.createElement('div');
+                    line.className = `boot-line ${msg.type}`;
+                    
+                    if (msg.special === 'dots-and-gif') {
+                        // Create the special animated line
+                        const textSpan = document.createElement('span');
+                        textSpan.textContent = msg.text;
+                        line.appendChild(textSpan);
+                        
+                        const dotsSpan = document.createElement('span');
+                        dotsSpan.className = 'animated-dots';
+                        dotsSpan.textContent = '';
+                        line.appendChild(dotsSpan);
+                        
+                        // Animate dots
+                        let dotCount = 0;
+                        const dotInterval = setInterval(() => {
+                            dotCount = (dotCount + 1) % 4;
+                            dotsSpan.textContent = '.'.repeat(dotCount);
+                        }, 400);
+                        
+                        // After 2 seconds, stop dots and add gif
+                        setTimeout(() => {
+                            clearInterval(dotInterval);
+                            dotsSpan.textContent = '...';
+                            
+                            const gif = document.createElement('img');
+                            gif.src = 'logo.gif';
+                            gif.className = 'boot-gif';
+                            gif.alt = '';
+                            line.appendChild(gif);
+                        }, 2000);
+                    } else {
+                        line.textContent = msg.text;
+                    }
+                    
+                    line.style.animationDelay = `${index * 0.08}s`;
+                    bootContainer.appendChild(line);
+                    index++;
+                    
+                    // Longer delay for the special line
+                    const delay = msg.special === 'dots-and-gif' ? 2500 : 255 + Math.random() * 170;
+                    setTimeout(addBootLine, delay);
+                } else {
+                    // Boot complete, show login
+                    setTimeout(() => {
+                        document.getElementById('boot-screen').style.display = 'none';
+                        document.getElementById('login-screen').style.display = 'flex';
+                        // Start typewriter password animation
+                        typewriterPassword();
+                    }, 1200);
+                }
+            }
+
+            addBootLine();
+        }
+
+        // Toggle password visibility
+        let passwordVisible = false;
+        
+        function togglePasswordVisibility() {
+            const input = document.getElementById('password-input');
+            const eyeIcon = document.getElementById('eye-icon');
+            const actualPassword = input.dataset.actualPassword || '1tsN0tAH0tel123!';
+            
+            passwordVisible = !passwordVisible;
+            
+            if (passwordVisible) {
+                input.type = 'text';
+                // Show actual password up to current length
+                const currentLen = input.value.replace(/\|/g, '').replace(/•/g, '').length || input.value.replace(/\|/g, '').length;
+                const dotCount = (input.value.match(/•/g) || []).length;
+                const showPassword = actualPassword.substring(0, dotCount || currentLen);
+                input.value = input.value.includes('|') ? showPassword + '|' : showPassword || actualPassword;
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                input.type = 'password';
+                const actualPassword = input.dataset.actualPassword || '1tsN0tAH0tel123!';
+                const currentText = input.value.replace(/\|/g, '');
+                const currentLen = currentText.length;
+                input.value = input.value.includes('|') ? '•'.repeat(currentLen) + '|' : '•'.repeat(actualPassword.length);
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        }
+
+        // Typewriter password effect with cursor
+        function typewriterPassword() {
+            const input = document.getElementById('password-input');
+            const actualPassword = '1tsN0tAH0tel123!';
+            let currentLength = 0;
+            input.classList.add('typing');
+            input.placeholder = '';
+            input.value = '|'; // Start with just cursor
+            input.dataset.actualPassword = actualPassword;
+            
+            function typeNextChar() {
+                if (currentLength < actualPassword.length) {
+                    currentLength++;
+                    
+                    if (passwordVisible) {
+                        input.type = 'text';
+                        input.value = actualPassword.substring(0, currentLength) + '|';
+                    } else {
+                        input.type = 'password';
+                        input.value = '•'.repeat(currentLength) + '|';
+                    }
+                    
+                    // Random delay between 50ms and 200ms for varied typing speed
+                    const delay = 50 + Math.random() * 150;
+                    setTimeout(typeNextChar, delay);
+                } else {
+                    // Remove cursor
+                    if (passwordVisible) {
+                        input.type = 'text';
+                        input.value = actualPassword;
+                    } else {
+                        input.type = 'password';
+                        input.value = '•'.repeat(actualPassword.length);
+                    }
+                    input.classList.remove('typing');
+                    
+                    // Mark password as fully typed
+                    passwordFullyTyped = true;
+                }
+            }
+            
+            // 0.4 second delay before starting to type
+            setTimeout(typeNextChar, 400);
+        }
+
+        // Login handler
+        document.getElementById('login-btn').addEventListener('click', login);
+        document.getElementById('password-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        function login() {
+            const loginBtn = document.getElementById('login-btn');
+            
+            // If password isn't fully typed, shake the button
+            if (!passwordFullyTyped) {
+                loginBtn.classList.remove('shake');
+                // Trigger reflow to restart animation
+                void loginBtn.offsetWidth;
+                loginBtn.classList.add('shake');
+                return;
+            }
+            
+            // Mark that we've completed the boot sequence
+            sessionStorage.setItem('harmMoeBooted', 'true');
+
+            // Start background music after a short delay (no welcome audio)
+            setTimeout(() => {
+                initMusicPlayer();
+                startMusicWithFadeIn();
+            }, 1500);
+            
+            // Fade out login screen
+            const loginScreen = document.getElementById('login-screen');
+            const osScreen = document.getElementById('os-screen');
+            
+            loginScreen.classList.add('fade-out');
+            osScreen.style.display = 'flex';
+            
+            // After fade out (2 seconds), hide login and fade in OS
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                osScreen.classList.add('visible');
+            }, 2000);
+        }
+        
+        // Initialize music player
+        function initMusicPlayer() {
+            if (!musicPlayer) {
+                musicPlayer = new Audio('audio.mp3');
+                musicPlayer.volume = 0.5; // Start at half volume
+                musicPlayer.loop = true;
+                
+                // Update progress bar
+                musicPlayer.addEventListener('timeupdate', updateProgress);
+                musicPlayer.addEventListener('loadedmetadata', () => {
+                    document.getElementById('total-time').textContent = formatTime(musicPlayer.duration);
+                });
+            }
+        }
+        
+        // Start music with fade in effect
+        function startMusicWithFadeIn() {
+            if (!musicPlayer) return;
+            
+            musicPlayer.volume = 0;
+            musicPlayer.play().catch(e => console.log('Music play failed:', e));
+            isPlaying = true;
+            updatePlayPauseIcon();
+            
+            // Fade in over 2 seconds to target volume (0.5)
+            const targetVolume = 0.5;
+            const fadeSteps = 40;
+            const fadeInterval = 2000 / fadeSteps;
+            let currentStep = 0;
+            
+            const fadeIn = setInterval(() => {
+                currentStep++;
+                musicPlayer.volume = Math.min((currentStep / fadeSteps) * targetVolume, targetVolume);
+                
+                if (currentStep >= fadeSteps) {
+                    clearInterval(fadeIn);
+                    musicPlayer.volume = targetVolume;
+                    document.getElementById('volume-slider').value = targetVolume * 100;
+                }
+            }, fadeInterval);
+        }
+        
+        // Toggle play/pause
+        function togglePlay() {
+            if (!musicPlayer) {
+                initMusicPlayer();
+            }
+            
+            if (isPlaying) {
+                musicPlayer.pause();
+                isPlaying = false;
+            } else {
+                musicPlayer.play().catch(e => console.log('Play failed:', e));
+                isPlaying = true;
+            }
+            updatePlayPauseIcon();
+        }
+        
+        // Update play/pause icon
+        function updatePlayPauseIcon() {
+            const icon = document.getElementById('play-icon');
+            if (isPlaying) {
+                icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            } else {
+                icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            }
+        }
+        
+        // Update progress bar
+        function updateProgress() {
+            if (!musicPlayer) return;
+            
+            const progress = (musicPlayer.currentTime / musicPlayer.duration) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('current-time').textContent = formatTime(musicPlayer.currentTime);
+        }
+        
+        // Seek in track
+        function seekMusic(event) {
+            if (!musicPlayer) return;
+            
+            const bar = document.getElementById('progress-bar');
+            const rect = bar.getBoundingClientRect();
+            const percent = (event.clientX - rect.left) / rect.width;
+            musicPlayer.currentTime = percent * musicPlayer.duration;
+        }
+        
+        // Set volume
+        function setVolume(value) {
+            if (musicPlayer) {
+                musicPlayer.volume = value / 100;
+            }
+        }
+        
+        // Previous track (placeholder - only one track)
+        function prevTrack() {
+            if (musicPlayer) {
+                musicPlayer.currentTime = 0;
+            }
+        }
+        
+        // Next track (placeholder - only one track)
+        function nextTrack() {
+            if (musicPlayer) {
+                musicPlayer.currentTime = 0;
+            }
+        }
+        
+        // Format time in M:SS
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+        
+        // Toggle music widget
+        function toggleMusicWidget() {
+            const widget = document.getElementById('music-widget');
+            const startMenu = document.getElementById('start-menu');
+            
+            // Close start menu if open
+            startMenu.classList.remove('active');
+            
+            widget.classList.toggle('active');
+        }
+
+        // Window controls
+        function openWindow(name) {
+            const id = name === 'hall' ? 'hall-window' : `window-${name}`;
+            const win = document.getElementById(id);
+            if (!win) return;
+            // Reset position to center
+            win.style.left = '50%';
+            win.style.top = '100px';
+            win.style.transform = 'translateX(-50%)';
+            win.classList.remove('fullscreen');
+            win.style.display = 'block';
+            win.style.animation = 'windowOpen 0.2s ease';
+            const titleEl = win.querySelector('.window-title');
+            if (titleEl) titleEl.textContent = (name === 'hall' ? 'Hall of Shame' : name);
+            // Close start menu if open
+            const startMenu = document.getElementById('start-menu');
+            if (startMenu) startMenu.classList.remove('active');
+        }
+
+        function closeWindow(id) {
+            const win = document.getElementById(id);
+            if (!win) return;
+            win.style.display = 'none';
+            win.classList.remove('fullscreen');
+        }
+
+        function toggleStartMenu() {
+            const menu = document.getElementById('start-menu');
+            const widget = document.getElementById('music-widget');
+            
+            // Close music widget if open
+            widget.classList.remove('active');
+            
+            menu.classList.toggle('active');
+        }
+
+        // Close menus when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('start-menu');
+            const startBtn = document.querySelector('.start-button');
+            const widget = document.getElementById('music-widget');
+            const soundIcon = document.getElementById('sound-tray-icon');
+            
+            if (menu && !menu.contains(e.target) && !startBtn.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+            
+            if (widget && !widget.contains(e.target) && !soundIcon.contains(e.target)) {
+                widget.classList.remove('active');
+            }
+        });
+
+        // Draggable window functionality - supports all windows
+        function initDraggableWindow() {
+            const windows = document.querySelectorAll('.window');
+            let draggingWin = null;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            windows.forEach(win => {
+                const header = win.querySelector('.window-header');
+                if (!header) return;
+
+                header.addEventListener('mousedown', function(e) {
+                    if (e.target.closest('.window-controls')) return;
+
+                    draggingWin = win;
+                    win.classList.add('dragging');
+
+                    const rect = win.getBoundingClientRect();
+                    win.style.transform = 'none';
+                    win.style.left = rect.left + 'px';
+                    win.style.top = rect.top + 'px';
+
+                    offsetX = e.clientX - rect.left;
+                    offsetY = e.clientY - rect.top;
+                    e.preventDefault();
+                });
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!draggingWin) return;
+                requestAnimationFrame(() => {
+                    draggingWin.style.left = (e.clientX - offsetX) + 'px';
+                    draggingWin.style.top = (e.clientY - offsetY) + 'px';
+                });
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (draggingWin) {
+                    draggingWin.classList.remove('dragging');
+                    draggingWin = null;
+                }
+            });
+        }
+
+        // Open the game window and load the game iframe
+        function openGame() {
+            const win = document.getElementById('game-window');
+            const iframe = document.getElementById('game-iframe');
+            win.style.left = '50%';
+            win.style.top = '100px';
+            win.style.transform = 'translateX(-50%)';
+            win.style.display = 'block';
+            win.style.animation = 'windowOpen 0.2s ease';
+            document.querySelector('#game-window .window-title').textContent = 'Game';
+            document.getElementById('start-menu').classList.remove('active');
+            // Set iframe src only when opening to avoid running game in background
+            if (!iframe.src || iframe.src.indexOf('game/game.html') === -1) {
+                iframe.src = 'game/game.html';
+            }
+        }
+
+        function closeGame() {
+            const win = document.getElementById('game-window');
+            const iframe = document.getElementById('game-iframe');
+            win.style.display = 'none';
+            // clear iframe src to stop audio/game loop
+            try { iframe.src = ''; } catch (e) {}
+            win.classList.remove('fullscreen');
+        }
+
+        function minimizeWindow(id) {
+            const win = document.getElementById(id);
+            if (win) win.style.display = 'none';
+        }
+
+        function toggleFullscreenWindow(id) {
+            const win = document.getElementById(id);
+            if (!win) return;
+            win.classList.toggle('fullscreen');
+        }
+
+        // Initialize draggable after DOM is ready
+        initDraggableWindow();
+
+        // Start everything
+        startSequence();
+
+        // Generate floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+    </script>
+</body>
+</html>
